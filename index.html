@@ -46,7 +46,7 @@
             <div class="bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl p-4 text-white shadow-lg flex items-center justify-between">
                 <div>
                     <span class="text-xs font-semibold uppercase tracking-wider bg-black/20 px-2 py-1 rounded-full">Unggul Sementara</span>
-                    <h2 id="winnerName" class="text-xl font-bold mt-1">Memuat data...</h2>
+                    <h2 id="winnerName" class="text-xl font-bold mt-1">Belum Ada Data</h2>
                     <p id="winnerVotes" class="text-sm opacity-90">0 Suara (0%)</p>
                 </div>
                 <div class="text-4xl text-amber-200 opacity-80">
@@ -58,7 +58,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                 <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
                     <p class="text-xs text-gray-500 font-medium">TPS Masuk</p>
-                    <p id="statTpsMasuk" class="text-lg font-bold text-gray-800">0 / 0</p>
+                    <p id="statTpsMasuk" class="text-lg font-bold text-gray-800">0 / 10</p>
                 </div>
                 <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
                     <p class="text-xs text-gray-500 font-medium">Suara Sah</p>
@@ -217,10 +217,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Firebase Configuration (Direct Integration)
+        // Firebase Configuration (Preserved & Auto Database Discovery)
         const firebaseConfig = {
             apiKey: "AIzaSyDLIVxoa33Iite3Dpv-0yTg-9hX1F9907c",
             authDomain: "hitungcepat-35b48.firebaseapp.com",
+            databaseURL: "https://hitungcepat-35b48-default-rtdb.firebaseio.com",
             projectId: "hitungcepat-35b48",
             storageBucket: "hitungcepat-35b48.firebasestorage.app",
             messagingSenderId: "149314985401",
@@ -249,10 +250,10 @@
 
         // Initialize App & Sync Data
         window.addEventListener('DOMContentLoaded', () => {
-            initFirebaseListeners();
             setupChart();
             renderInputFormFields();
             loadSettingsToForm();
+            initFirebaseListeners();
         });
 
         // Listen for Realtime Updates from Firebase
@@ -266,8 +267,8 @@
                     appSettings = data;
                     renderInputFormFields();
                     loadSettingsToForm();
+                    updateUI();
                 } else {
-                    // Save Default
                     set(ref(db, 'settings'), appSettings);
                 }
             });
@@ -283,6 +284,7 @@
 
                 updateUI();
             }, (error) => {
+                console.error("Firebase Error:", error);
                 syncStatus.className = "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-800 text-red-200";
                 syncStatus.innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-red-400"></span>Terputus`;
             });
