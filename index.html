@@ -220,15 +220,16 @@
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getDatabase, ref, set, get, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Konfigurasi Firebase
+        // Konfigurasi Firebase Anda yang sudah terhubung
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyDLIVxoa33Iite3Dpv-0yTg-9hX1F9907c",
+            authDomain: "hitungcepat-35b48.firebaseapp.com",
+            databaseURL: "https://hitungcepat-35b48-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "hitungcepat-35b48",
+            storageBucket: "hitungcepat-35b48.firebasestorage.app",
+            messagingSenderId: "149314985401",
+            appId: "1:149314985401:web:9000057cacf07048a96a68",
+            measurementId: "G-4BQ9R9CFJR"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -397,7 +398,7 @@
             const votes = Array.from(voteInputs).map(input => parseInt(input.value) || 0);
             const rusak = parseInt(document.getElementById('inputSuaraRusak').value) || 0;
 
-            const tpsKey = tpsName.replace(/[^a-zA-Z0-0]/g, "_"); // Valid Firebase Key
+            const tpsKey = tpsName.replace(/[^a-zA-Z0-9]/g, "_"); // Valid Firebase Key
 
             set(ref(db, `tpsData/${tpsKey}`), {
                 name: tpsName,
