@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quick Count Pilkades Real-Time</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
+        .touch-action-manipulation { touch-action: manipulation; }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 antialiased min-h-screen pb-20 md:pb-6">
+
+    <!-- Header & App Bar -->
+    <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-vote-yea text-2xl text-yellow-300"></i>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">Quick Count Pilkades</h1>
+                    <p class="text-xs text-indigo-200">Realtime Tim Sukses • Firebase Sync</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span id="syncStatus" class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-800 text-indigo-200">
+                    <span class="w-2 h-2 mr-1.5 rounded-full bg-yellow-400 animate-pulse"></span>
+                    Menghubungkan...
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-4xl mx-auto px-3 sm:px-4 pt-4">
+
+        <!-- TAB 1: BERANDA / DASBOR -->
+        <section id="tab-beranda" class="tab-content space-y-4">
+            
+            <!-- Winner Highlight Card -->
+            <div class="bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl p-4 text-white shadow-lg flex items-center justify-between">
+                <div>
+                    <span class="text-xs font-semibold uppercase tracking-wider bg-black/20 px-2 py-1 rounded-full">Unggul Sementara</span>
+                    <h2 id="winnerName" class="text-xl font-bold mt-1">Memuat data...</h2>
+                    <p id="winnerVotes" class="text-sm opacity-90">0 Suara (0%)</p>
+                </div>
+                <div class="text-4xl text-amber-200 opacity-80">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+            </div>
+
+            <!-- Stats Overview Cards -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+                    <p class="text-xs text-gray-500 font-medium">TPS Masuk</p>
+                    <p id="statTpsMasuk" class="text-lg font-bold text-gray-800">0 / 0</p>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+                    <p class="text-xs text-gray-500 font-medium">Suara Sah</p>
+                    <p id="statSuaraSah" class="text-lg font-bold text-indigo-600">0</p>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+                    <p class="text-xs text-gray-500 font-medium">Suara Tidak Sah</p>
+                    <p id="statSuaraTidakSah" class="text-lg font-bold text-red-500">0</p>
+                </div>
+                <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+                    <p class="text-xs text-gray-500 font-medium">Total Masuk</p>
+                    <p id="statTotalSuara" class="text-lg font-bold text-emerald-600">0</p>
+                </div>
+            </div>
+
+            <!-- Candidate Progress List -->
+            <div id="candidateCardsContainer" class="space-y-3">
+                <!-- Dynamically injected via JS -->
+            </div>
+
+            <!-- Chart Section -->
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                <h3 class="font-bold text-gray-700 text-sm mb-3 flex items-center">
+                    <i class="fa-solid fa-chart-pie mr-2 text-indigo-600"></i> Persentase Perolehan Suara
+                </h3>
+                <div class="relative h-56 w-full flex justify-center items-center">
+                    <canvas id="quickCountChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: INPUT DATA TPS -->
+        <section id="tab-input" class="tab-content hidden space-y-4">
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                <h2 class="font-bold text-gray-800 text-base mb-1">Input Hasil Perhitungan TPS</h2>
+                <p class="text-xs text-gray-500 mb-4">Pastikan data yang diinput sesuai dengan berita acara C1 di lapangan.</p>
+
+                <form id="tpsForm" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Nomor / Nama TPS</label>
+                        <input type="text" id="inputTpsName" placeholder="Contoh: TPS 01 RW 02" required 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
+                    </div>
+
+                    <!-- Counter Controls for 3 Candidates -->
+                    <div id="candidateInputs" class="space-y-3">
+                        <!-- Injected via JS -->
+                    </div>
+
+                    <!-- Invalid Votes Input -->
+                    <div class="bg-red-50 p-3 rounded-lg border border-red-200">
+                        <label class="block text-xs font-bold text-red-700 uppercase tracking-wide mb-1">Suara Tidak Sah / Rusak</label>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" onclick="adjustCount('inputSuaraRusak', -1)" 
+                                class="w-10 h-10 bg-red-200 text-red-800 font-bold rounded-lg text-lg flex items-center justify-center active:scale-95 touch-action-manipulation">-</button>
+                            <input type="number" id="inputSuaraRusak" value="0" min="0" 
+                                class="w-full px-3 py-2 border border-red-300 rounded-lg text-center font-bold text-red-700 text-base focus:ring-2 focus:ring-red-500 focus:outline-none">
+                            <button type="button" onclick="adjustCount('inputSuaraRusak', 1)" 
+                                class="w-10 h-10 bg-red-600 text-white font-bold rounded-lg text-lg flex items-center justify-center active:scale-95 touch-action-manipulation">+</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" 
+                        class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all active:scale-[0.98] flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Simpan & Kirim Data TPS</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- TAB 3: REKAP DATA TPS -->
+        <section id="tab-rekap" class="tab-content hidden space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="font-bold text-gray-800 text-base">Rekapitulasi Suara Per TPS</h2>
+                <button onclick="copyToWhatsApp()" class="bg-emerald-600 text-white text-xs px-3 py-2 rounded-lg font-medium shadow flex items-center space-x-1 active:scale-95">
+                    <i class="fa-brands fa-whatsapp text-sm"></i>
+                    <span>Salin Laporan WA</span>
+                </button>
+            </div>
+
+            <div id="tpsListContainer" class="space-y-2.5">
+                <!-- Dynamically Injected TPS Cards -->
+            </div>
+        </section>
+
+        <!-- TAB 4: PENGATURAN -->
+        <section id="tab-pengaturan" class="tab-content hidden space-y-4">
+            <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
+                <h2 class="font-bold text-gray-800 text-base">Pengaturan Calon & Sistem</h2>
+                
+                <form id="settingsForm" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Calon 01</label>
+                        <input type="text" id="settingC1" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Calon 02</label>
+                        <input type="text" id="settingC2" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Calon 03</label>
+                        <input type="text" id="settingC3" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Target Total TPS</label>
+                        <input type="number" id="settingTargetTps" min="1" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    </div>
+                    <button type="submit" class="w-full bg-gray-800 text-white font-bold py-2 rounded-lg text-sm shadow">
+                        Simpan Pengaturan
+                    </button>
+                </form>
+
+                <hr class="my-4 border-gray-200">
+
+                <div class="space-y-2">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wide">Backup & Reset Data</h3>
+                    <button onclick="exportToCSV()" class="w-full bg-emerald-100 text-emerald-800 font-semibold py-2 rounded-lg text-xs flex items-center justify-center space-x-1 border border-emerald-300">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span>Ekspor Data ke CSV / Excel</span>
+                    </button>
+                    <button onclick="resetAllData()" class="w-full bg-red-100 text-red-700 font-semibold py-2 rounded-lg text-xs flex items-center justify-center space-x-1 border border-red-300">
+                        <i class="fa-solid fa-trash-alt"></i>
+                        <span>Reset/Hapus Seluruh Data</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation Bar (Mobile Native App Style) -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 pb-safe">
+        <div class="max-w-4xl mx-auto flex justify-around items-center h-14">
+            <button onclick="switchTab('beranda')" id="nav-beranda" class="nav-btn flex-1 flex flex-col items-center justify-center text-indigo-600">
+                <i class="fa-solid fa-chart-line text-lg"></i>
+                <span class="text-[10px] font-medium mt-0.5">Beranda</span>
+            </button>
+            <button onclick="switchTab('input')" id="nav-input" class="nav-btn flex-1 flex flex-col items-center justify-center text-gray-400">
+                <i class="fa-solid fa-plus-circle text-lg"></i>
+                <span class="text-[10px] font-medium mt-0.5">Input TPS</span>
+            </button>
+            <button onclick="switchTab('rekap')" id="nav-rekap" class="nav-btn flex-1 flex flex-col items-center justify-center text-gray-400">
+                <i class="fa-solid fa-list-check text-lg"></i>
+                <span class="text-[10px] font-medium mt-0.5">Data TPS</span>
+            </button>
+            <button onclick="switchTab('pengaturan')" id="nav-pengaturan" class="nav-btn flex-1 flex flex-col items-center justify-center text-gray-400">
+                <i class="fa-solid fa-gear text-lg"></i>
+                <span class="text-[10px] font-medium mt-0.5">Pengaturan</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- FIREBASE MODULE & LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Firebase Configuration (Direct Integration)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDLIVxoa33Iite3Dpv-0yTg-9hX1F9907c",
+            authDomain: "hitungcepat-35b48.firebaseapp.com",
+            projectId: "hitungcepat-35b48",
+            storageBucket: "hitungcepat-35b48.firebasestorage.app",
+            messagingSenderId: "149314985401",
+            appId: "1:149314985401:web:9000057cacf07048a96a68",
+            measurementId: "G-4BQ9R9CFJR"
+        };
+
+        // Initialize Firebase App
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // State Application
+        let appSettings = {
+            candidates: ["Calon 01", "Calon 02", "Calon 03"],
+            targetTps: 10
+        };
+        let tpsDataList = {};
+        let myChart = null;
+
+        // Colors Palette for 3 Candidates
+        const candidateColors = [
+            { bg: "bg-blue-500", text: "text-blue-600", border: "border-blue-500", hex: "#3b82f6" },
+            { bg: "bg-emerald-500", text: "text-emerald-600", border: "border-emerald-500", hex: "#10b981" },
+            { bg: "bg-purple-500", text: "text-purple-600", border: "border-purple-500", hex: "#a855f7" }
+        ];
+
+        // Initialize App & Sync Data
+        window.addEventListener('DOMContentLoaded', () => {
+            initFirebaseListeners();
+            setupChart();
+            renderInputFormFields();
+            loadSettingsToForm();
+        });
+
+        // Listen for Realtime Updates from Firebase
+        function initFirebaseListeners() {
+            const syncStatus = document.getElementById('syncStatus');
+
+            // Listen Settings
+            onValue(ref(db, 'settings'), (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    appSettings = data;
+                    renderInputFormFields();
+                    loadSettingsToForm();
+                } else {
+                    // Save Default
+                    set(ref(db, 'settings'), appSettings);
+                }
+            });
+
+            // Listen TPS Data
+            onValue(ref(db, 'tpsData'), (snapshot) => {
+                const data = snapshot.val();
+                tpsDataList = data || {};
+                
+                // Update Sync Indicator
+                syncStatus.className = "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-800 text-emerald-200";
+                syncStatus.innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-emerald-400"></span>Terhubung`;
+
+                updateUI();
+            }, (error) => {
+                syncStatus.className = "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-800 text-red-200";
+                syncStatus.innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-red-400"></span>Terputus`;
+            });
+        }
+
+        // Render Candidate Input Fields inside Input Form
+        function renderInputFormFields() {
+            const container = document.getElementById('candidateInputs');
+            container.innerHTML = '';
+
+            appSettings.candidates.forEach((name, index) => {
+                const col = candidateColors[index % candidateColors.length];
+                container.innerHTML += `
+                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                        <label class="block text-xs font-bold ${col.text} uppercase tracking-wide mb-1">0${index+1}. ${name}</label>
+                        <div class="flex items-center space-x-2">
+                            <button type="button" onclick="adjustCount('c_${index}', -1)" 
+                                class="w-10 h-10 bg-gray-200 text-gray-800 font-bold rounded-lg text-lg flex items-center justify-center active:scale-95 touch-action-manipulation">-</button>
+                            <input type="number" id="c_${index}" value="0" min="0" 
+                                class="candidate-vote-input w-full px-3 py-2 border border-gray-300 rounded-lg text-center font-bold text-gray-800 text-base focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                            <button type="button" onclick="adjustCount('c_${index}', 1)" 
+                                class="w-10 h-10 ${col.bg} text-white font-bold rounded-lg text-lg flex items-center justify-center active:scale-95 touch-action-manipulation">+</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Update Dashboard Statistics & UI
+        function updateUI() {
+            const tpsKeys = Object.keys(tpsDataList);
+            const totalTpsMasuk = tpsKeys.length;
+            
+            let candidateVotes = [0, 0, 0];
+            let totalSuaraTidakSah = 0;
+
+            tpsKeys.forEach(key => {
+                const item = tpsDataList[key];
+                if (item.votes) {
+                    item.votes.forEach((v, idx) => {
+                        candidateVotes[idx] = (candidateVotes[idx] || 0) + (parseInt(v) || 0);
+                    });
+                }
+                totalSuaraTidakSah += parseInt(item.rusak || 0);
+            });
+
+            const totalSuaraSah = candidateVotes.reduce((a, b) => a + b, 0);
+            const grandTotalSuara = totalSuaraSah + totalSuaraTidakSah;
+
+            // Update Overview Widgets
+            document.getElementById('statTpsMasuk').innerText = `${totalTpsMasuk} / ${appSettings.targetTps}`;
+            document.getElementById('statSuaraSah').innerText = totalSuaraSah.toLocaleString('id-ID');
+            document.getElementById('statSuaraTidakSah').innerText = totalSuaraTidakSah.toLocaleString('id-ID');
+            document.getElementById('statTotalSuara').innerText = grandTotalSuara.toLocaleString('id-ID');
+
+            // Render Candidate Cards Overview
+            const cardsContainer = document.getElementById('candidateCardsContainer');
+            cardsContainer.innerHTML = '';
+
+            let maxVotes = -1;
+            let winnerIndex = 0;
+
+            appSettings.candidates.forEach((name, idx) => {
+                const votes = candidateVotes[idx] || 0;
+                const percentage = totalSuaraSah > 0 ? ((votes / totalSuaraSah) * 100).toFixed(1) : 0;
+                const col = candidateColors[idx % candidateColors.length];
+
+                if (votes > maxVotes) {
+                    maxVotes = votes;
+                    winnerIndex = idx;
+                }
+
+                cardsContainer.innerHTML += `
+                    <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-6 h-6 rounded-full ${col.bg} text-white text-xs font-bold flex items-center justify-center">0${idx+1}</span>
+                                <h4 class="font-bold text-gray-800 text-sm">${name}</h4>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-base font-extrabold text-gray-800">${votes.toLocaleString('id-ID')}</span>
+                                <span class="text-xs text-gray-500 font-medium"> (${percentage}%)</span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                            <div class="${col.bg} h-2.5 rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Update Winner Highlight Card
+            if (totalSuaraSah > 0) {
+                const winPct = ((candidateVotes[winnerIndex] / totalSuaraSah) * 100).toFixed(1);
+                document.getElementById('winnerName').innerText = `0${winnerIndex+1}. ${appSettings.candidates[winnerIndex]}`;
+                document.getElementById('winnerVotes').innerText = `${candidateVotes[winnerIndex].toLocaleString('id-ID')} Suara (${winPct}%)`;
+            } else {
+                document.getElementById('winnerName').innerText = "Belum Ada Data";
+                document.getElementById('winnerVotes').innerText = "0 Suara (0%)";
+            }
+
+            // Update Chart
+            if (myChart) {
+                myChart.data.labels = appSettings.candidates;
+                myChart.data.datasets[0].data = candidateVotes;
+                myChart.update();
+            }
+
+            // Render TPS Cards List
+            renderTpsList();
+        }
+
+        // Render TPS Rekap List
+        function renderTpsList() {
+            const container = document.getElementById('tpsListContainer');
+            container.innerHTML = '';
+
+            const tpsKeys = Object.keys(tpsDataList);
+            if (tpsKeys.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-400 bg-white rounded-xl border border-gray-200">
+                        <i class="fa-solid fa-inbox text-3xl mb-2"></i>
+                        <p class="text-xs">Belum ada data TPS yang masuk.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            tpsKeys.reverse().forEach(key => {
+                const item = tpsDataList[key];
+                let detailSuaraHtml = '';
+
+                appSettings.candidates.forEach((cName, idx) => {
+                    const col = candidateColors[idx % candidateColors.length];
+                    const count = item.votes ? item.votes[idx] || 0 : 0;
+                    detailSuaraHtml += `<span class="text-xs ${col.text} font-bold mr-2">C${idx+1}: ${count}</span>`;
+                });
+
+                container.innerHTML += `
+                    <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex justify-between items-center">
+                        <div>
+                            <h4 class="font-bold text-gray-800 text-sm">${item.name}</h4>
+                            <div class="mt-0.5">${detailSuaraHtml} <span class="text-xs text-red-500 font-semibold">| Rusak: ${item.rusak || 0}</span></div>
+                        </div>
+                        <button onclick="deleteTps('${key}')" class="text-gray-400 hover:text-red-500 p-2 active:scale-95">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        // Setup Chart.js
+        function setupChart() {
+            const ctx = document.getElementById('quickCountChart').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: appSettings.candidates,
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: candidateColors.map(c => c.hex),
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        // Form Submit Handler (Save TPS Data to Firebase)
+        document.getElementById('tpsForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const tpsName = document.getElementById('inputTpsName').value.trim();
+            const votes = appSettings.candidates.map((_, idx) => parseInt(document.getElementById(`c_${idx}`).value) || 0);
+            const rusak = parseInt(document.getElementById('inputSuaraRusak').value) || 0;
+
+            const tpsId = tpsName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+
+            set(ref(db, `tpsData/${tpsId}`), {
+                name: tpsName,
+                votes: votes,
+                rusak: rusak,
+                timestamp: Date.now()
+            }).then(() => {
+                alert(`Data ${tpsName} berhasil disimpan!`);
+                document.getElementById('tpsForm').reset();
+                switchTab('beranda');
+            }).catch((err) => {
+                alert("Gagal menyimpan data: " + err.message);
+            });
+        });
+
+        // Settings Form Submit Handler
+        document.getElementById('settingsForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newSettings = {
+                candidates: [
+                    document.getElementById('settingC1').value.trim(),
+                    document.getElementById('settingC2').value.trim(),
+                    document.getElementById('settingC3').value.trim()
+                ],
+                targetTps: parseInt(document.getElementById('settingTargetTps').value) || 10
+            };
+
+            set(ref(db, 'settings'), newSettings).then(() => {
+                alert('Pengaturan berhasil diperbarui!');
+            });
+        });
+
+        function loadSettingsToForm() {
+            document.getElementById('settingC1').value = appSettings.candidates[0] || '';
+            document.getElementById('settingC2').value = appSettings.candidates[1] || '';
+            document.getElementById('settingC3').value = appSettings.candidates[2] || '';
+            document.getElementById('settingTargetTps').value = appSettings.targetTps || 10;
+        }
+
+        // Window Globals for Onclick Actions
+        window.adjustCount = function(id, delta) {
+            const input = document.getElementById(id);
+            let val = parseInt(input.value) || 0;
+            val = Math.max(0, val + delta);
+            input.value = val;
+        };
+
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-indigo-600');
+                btn.classList.add('text-gray-400');
+            });
+            document.getElementById(`nav-${tabName}`).classList.remove('text-gray-400');
+            document.getElementById(`nav-${tabName}`).classList.add('text-indigo-600');
+        };
+
+        window.deleteTps = function(key) {
+            if (confirm("Apakah Anda yakin ingin menghapus data TPS ini?")) {
+                remove(ref(db, `tpsData/${key}`));
+            }
+        };
+
+        window.resetAllData = function() {
+            if (confirm("PERINGATAN! Seluruh data TPS di Firebase akan dihapus secara permanen. Lanjutkan?")) {
+                remove(ref(db, 'tpsData')).then(() => alert("Seluruh data TPS telah di-reset."));
+            }
+        };
+
+        window.copyToWhatsApp = function() {
+            const tpsKeys = Object.keys(tpsDataList);
+            let totalVotes = [0, 0, 0];
+            let totalRusak = 0;
+
+            tpsKeys.forEach(k => {
+                const item = tpsDataList[k];
+                if (item.votes) item.votes.forEach((v, i) => totalVotes[i] += parseInt(v) || 0);
+                totalRusak += parseInt(item.rusak) || 0;
+            });
+
+            const totalSah = totalVotes.reduce((a, b) => a + b, 0);
+
+            let text = `*LAPORAN QUICK COUNT PILKADES*\n`;
+            text += `Total TPS Masuk: ${tpsKeys.length} / ${appSettings.targetTps}\n\n`;
+            text += `*PEROLEHAN SUARA:*\n`;
+            appSettings.candidates.forEach((name, idx) => {
+                const v = totalVotes[idx];
+                const pct = totalSah > 0 ? ((v / totalSah) * 100).toFixed(1) : 0;
+                text += `0${idx+1}. ${name}: ${v.toLocaleString('id-ID')} (${pct}%)\n`;
+            });
+            text += `\nSuara Tidak Sah: ${totalRusak.toLocaleString('id-ID')}\n`;
+            text += `Total Suara Sah: ${totalSah.toLocaleString('id-ID')}\n\n`;
+            text += `_Diperbarui secara otomatis via Quick Count App_`;
+
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Laporan berhasil disalin ke Clipboard! Tinggal tempel (Paste) di grup WhatsApp.");
+            });
+        };
+
+        window.exportToCSV = function() {
+            const tpsKeys = Object.keys(tpsDataList);
+            if (tpsKeys.length === 0) return alert("Belum ada data untuk diekspor!");
+
+            let csv = `Nama TPS,${appSettings.candidates.join(',')},Suara Rusak,Total Suara\n`;
+
+            tpsKeys.forEach(k => {
+                const item = tpsDataList[k];
+                const v = item.votes || [0, 0, 0];
+                const total = v.reduce((a,b) => a+b, 0) + (parseInt(item.rusak) || 0);
+                csv += `"${item.name}",${v.join(',')},${item.rusak || 0},${total}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `quick_count_pilkades_${Date.now()}.csv`;
+            a.click();
+        };
+    </script>
+</body>
+</html>
