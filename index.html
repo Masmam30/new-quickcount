@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Quick Count Pilkades Real-Time (Admin & Timses)</title>
+    <title>Quick Count Pilkades Real-Time (Restriksi TPS Saksi)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome CDN -->
@@ -25,7 +25,7 @@
             <form id="loginForm" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Email Akun</label>
-                    <input type="email" id="loginEmail" placeholder="admin@desa.com / timses@desa.com" required 
+                    <input type="email" id="loginEmail" placeholder="admin@desa.com / saksi1@desa.com" required 
                         class="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
                 </div>
                 <div>
@@ -40,13 +40,14 @@
                 </button>
             </form>
             <div class="text-center pt-2 border-t border-gray-100 text-xs text-gray-400">
-                Hubungi Admin jika belum memiliki kata sandi atau akun baru.
+                Hubungi Admin jika Anda belum memiliki akun Saksi TPS.
             </div>
         </div>
     </div>
 
     <!-- MAIN APP DASHBOARD -->
     <div id="appScreen" class="hidden">
+        <!-- HEADER -->
         <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-40">
             <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
                 <div class="flex items-center space-x-3">
@@ -102,22 +103,45 @@
                 </div>
             </section>
 
-            <!-- DASHBOARD / REKAPITULASI LEADERBOARD -->
-            <section id="tab-dashboard" class="tab-content space-y-4">
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
-                    <div class="flex justify-between items-center border-b pb-2">
-                        <h3 class="font-bold text-gray-800 text-sm">Pemenang Sementara</h3>
-                        <span id="winnerBadge" class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-0.5 rounded">Memimpin</span>
+            <!-- FORM INPUT SUARA PER TPS (RESTRIKSI TPS) -->
+            <section class="bg-white p-4 rounded-xl border border-indigo-200 shadow-sm space-y-4">
+                <div class="flex justify-between items-center border-b pb-2">
+                    <h2 class="font-bold text-indigo-900 text-sm flex items-center">
+                        <i class="fa-solid fa-pen-to-square mr-2 text-indigo-600"></i> Input Hasil Suara TPS
+                    </h2>
+                    <span id="assignedTpsBadge" class="bg-indigo-100 text-indigo-800 text-xs font-extrabold px-2.5 py-1 rounded-lg">
+                        Tugas: TPS -
+                    </span>
+                </div>
+
+                <form id="voteInputForm" class="space-y-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nama / Nomor TPS</label>
+                        <input type="text" id="inputTpsName" placeholder="Contoh: TPS 01" required 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 font-bold text-gray-800 disabled:opacity-75">
+                        <p id="tpsLockNotice" class="text-[10px] text-indigo-600 mt-1 hidden">
+                            <i class="fa-solid fa-lock"></i> TPS dikunci sesuai dengan plotting wilayah tugas akun Anda.
+                        </p>
                     </div>
-                    <h2 id="winnerName" class="text-xl font-bold mt-1">Belum Ada Data</h2>
-                    <div id="candidateCardsContainer" class="space-y-3">
+
+                    <!-- Input Dinamis Per-Paslon -->
+                    <div id="candidateInputFields" class="space-y-2.5">
                         <!-- Injected via JS -->
                     </div>
-                </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-red-600 mb-1">Jumlah Suara Tidak Sah / Rusak</label>
+                        <input type="number" id="inputSuaraRusak" min="0" placeholder="0" required class="w-full px-3 py-2 border border-red-200 rounded-lg text-sm font-semibold text-red-600">
+                    </div>
+
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm shadow transition-all active:scale-[0.98]">
+                        <i class="fa-solid fa-floppy-disk mr-1"></i> Simpan Data Suara TPS
+                    </button>
+                </form>
             </section>
 
-            <!-- TAB PENGATURAN & PANEL ADMIN -->
-            <section id="tab-pengaturan" class="tab-content space-y-4">
+            <!-- PENGATURAN & PANEL ADMIN -->
+            <section class="space-y-4">
                 <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 flex justify-between items-center">
                     <div>
                         <p class="text-xs text-indigo-500 font-semibold uppercase">Akun Terhubung</p>
@@ -129,22 +153,28 @@
                     </button>
                 </div>
 
-                <!-- ADMIN ONLY: Mendaftar Akun Timses Baru -->
+                <!-- ADMIN ONLY: Mendaftar Akun Timses Baru & Plotting TPS -->
                 <div id="adminUserManagement" class="admin-only hidden bg-white p-4 rounded-xl border border-indigo-200 shadow-sm space-y-3">
                     <h3 class="font-bold text-indigo-900 text-sm flex items-center">
-                        <i class="fa-solid fa-user-plus mr-2 text-indigo-600"></i> Tambah Akun Timses / Saksi (Khusus Admin)
+                        <i class="fa-solid fa-user-plus mr-2 text-indigo-600"></i> Buat Akun Saksi & Plotting TPS (Admin Only)
                     </h3>
                     <form id="createTimsesForm" class="space-y-3">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Email Timses Baru</label>
-                            <input type="email" id="newTimsesEmail" placeholder="saksi1@desa.com" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Email Saksi Baru</label>
+                                <input type="email" id="newTimsesEmail" placeholder="saksi1@desa.com" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-600 mb-1">Penugasan TPS</label>
+                                <input type="text" id="newTimsesTps" placeholder="Contoh: TPS 01" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm uppercase">
+                            </div>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-gray-600 mb-1">Kata Sandi</label>
                             <input type="password" id="newTimsesPassword" placeholder="Minimal 6 karakter" minlength="6" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
                         </div>
                         <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 rounded-lg text-sm shadow">
-                            Buat Akun Timses
+                            Buat Akun Saksi TPS
                         </button>
                     </form>
                 </div>
@@ -178,7 +208,7 @@
                 </div>
 
                 <div id="timsesNotice" class="bg-yellow-50 border border-yellow-200 p-4 rounded-xl text-xs text-yellow-800">
-                    <i class="fa-solid fa-circle-info mr-1"></i> Anda masuk sebagai <b>Timses / Saksi TPS</b>. Pengaturan calon dan DPT Desa hanya dapat dikelola oleh Admin.
+                    <i class="fa-solid fa-circle-info mr-1"></i> Anda masuk sebagai <b>Saksi TPS</b>. Anda hanya diizinkan memasukkan data untuk TPS yang telah ditugaskan.
                 </div>
             </section>
         </main>
@@ -188,7 +218,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, get, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
         // Konfigurasi Firebase
         const firebaseConfig = {
@@ -211,6 +241,7 @@
         };
         let tpsDataList = {};
         let isAdmin = false;
+        let currentUserAssignedTps = null;
 
         // AUTHENTICATION & ROLE LISTENERS
         onAuthStateChanged(auth, (user) => {
@@ -219,7 +250,7 @@
                 document.getElementById('appScreen').classList.remove('hidden');
                 document.getElementById('userEmailDisplay').innerText = user.email;
 
-                checkUserRole(user.email);
+                checkUserRoleAndPlotting(user);
                 initFirebaseListeners();
             } else {
                 document.getElementById('authScreen').classList.remove('hidden');
@@ -227,19 +258,47 @@
             }
         });
 
-        function checkUserRole(email) {
-            if (email.toLowerCase().includes("admin") || email.toLowerCase() === "masmam30@gmail.com") {
+        // CEK ROLE & RESTRIKSI TPS SAKSI
+        function checkUserRoleAndPlotting(user) {
+            const email = user.email.toLowerCase();
+            
+            // Cek apakah Admin
+            if (email.includes("admin") || email === "masmam30@gmail.com") {
                 isAdmin = true;
+                currentUserAssignedTps = null;
                 document.getElementById('roleBadge').innerText = "ADMIN";
                 document.getElementById('roleBadge').className = "px-2 py-0.5 rounded text-xs font-bold bg-red-500 text-white uppercase";
                 document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
                 document.getElementById('timsesNotice').classList.add('hidden');
+                
+                // Unlock input TPS untuk Admin
+                const tpsInput = document.getElementById('inputTpsName');
+                tpsInput.disabled = false;
+                tpsInput.value = '';
+                document.getElementById('assignedTpsBadge').innerText = "Tugas: Semua TPS (Admin)";
+                document.getElementById('tpsLockNotice').classList.add('hidden');
             } else {
                 isAdmin = false;
-                document.getElementById('roleBadge').innerText = "TIMSES";
+                document.getElementById('roleBadge').innerText = "SAKSI";
                 document.getElementById('roleBadge').className = "px-2 py-0.5 rounded text-xs font-bold bg-yellow-400 text-yellow-900 uppercase";
                 document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
                 document.getElementById('timsesNotice').classList.remove('hidden');
+
+                // Ambil data plotting TPS dari Database
+                get(ref(db, `users/${user.uid}`)).then((snapshot) => {
+                    const userData = snapshot.val();
+                    if (userData && userData.assignedTps) {
+                        currentUserAssignedTps = userData.assignedTps.toUpperCase();
+                        
+                        // Kunci Input TPS untuk Saksi
+                        const tpsInput = document.getElementById('inputTpsName');
+                        tpsInput.value = currentUserAssignedTps;
+                        tpsInput.disabled = true;
+                        
+                        document.getElementById('assignedTpsBadge').innerText = `Tugas: ${currentUserAssignedTps}`;
+                        document.getElementById('tpsLockNotice').classList.remove('hidden');
+                    }
+                });
             }
         }
 
@@ -252,20 +311,29 @@
                 .catch((error) => alert("Gagal Login: " + error.message));
         });
 
-        // REGISTER TIMSES HANDLER (ADMIN ONLY)
+        // REGISTER SAKSI & PLOTTING TPS (ADMIN ONLY)
         document.getElementById('createTimsesForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            if (!isAdmin) return alert("Hanya Admin yang dapat membuat akun timses!");
+            if (!isAdmin) return alert("Hanya Admin yang dapat membuat akun saksi!");
 
             const email = document.getElementById('newTimsesEmail').value;
             const password = document.getElementById('newTimsesPassword').value;
+            const assignedTps = document.getElementById('newTimsesTps').value.trim().toUpperCase();
 
             createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Simpan data Otoritas TPS Saksi ke Node 'users'
+                    return set(ref(db, `users/${userCredential.user.uid}`), {
+                        email: email,
+                        role: "timses",
+                        assignedTps: assignedTps
+                    });
+                })
                 .then(() => {
-                    alert(`Akun Timses (${email}) berhasil dibuat!`);
+                    alert(`Akun Saksi (${email}) berhasil dibuat & dikunci untuk ${assignedTps}!`);
                     document.getElementById('createTimsesForm').reset();
                 })
-                .catch((error) => alert("Gagal Membuat Akun: " + error.message));
+                .catch((error) => alert("Gagal Membuat Akun Saksi: " + error.message));
         });
 
         window.logoutUser = function() {
@@ -274,13 +342,14 @@
 
         // LISTEN DATA REALTIME FIREBASE
         function initFirebaseListeners() {
-            // Synchronize Settings (Termasuk DPT)
+            // Synchronize Settings (DPT & Paslon)
             onValue(ref(db, 'settings'), (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     appSettings = data;
                     if(!appSettings.totalDpt) appSettings.totalDpt = 0;
                     loadSettingsToForm();
+                    renderCandidateInputFields();
                     calculateSynchronization();
                 } else if (isAdmin) {
                     set(ref(db, 'settings'), appSettings);
@@ -297,6 +366,51 @@
                 `;
             });
         }
+
+        // RENDER DYNAMIC CANDIDATE INPUT FIELDS
+        function renderCandidateInputFields() {
+            const container = document.getElementById('candidateInputFields');
+            container.innerHTML = '';
+            
+            appSettings.candidates.forEach((cand, idx) => {
+                container.innerHTML += `
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Perolehan Suara ${cand}</label>
+                        <input type="number" id="inputCand_${idx}" min="0" placeholder="0" required class="cand-vote-input w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                    </div>
+                `;
+            });
+        }
+
+        // INPUT SUARA TPS HANDLER
+        document.getElementById('voteInputForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Batasi TPS jika Saksi
+            const tpsName = isAdmin 
+                ? document.getElementById('inputTpsName').value.trim().toUpperCase() 
+                : currentUserAssignedTps;
+
+            if (!tpsName) return alert("Pilih / Isikan Nama TPS terlebih dahulu!");
+
+            const voteInputs = document.querySelectorAll('.cand-vote-input');
+            const votes = Array.from(voteInputs).map(input => parseInt(input.value) || 0);
+            const rusak = parseInt(document.getElementById('inputSuaraRusak').value) || 0;
+
+            const tpsKey = tpsName.replace(/[^a-zA-Z0-0]/g, "_"); // Valid Firebase Key
+
+            set(ref(db, `tpsData/${tpsKey}`), {
+                name: tpsName,
+                votes: votes,
+                rusak: rusak,
+                updatedBy: auth.currentUser.email
+            }).then(() => {
+                alert(`Data Suara ${tpsName} Berhasil Disimpan!`);
+                if(isAdmin) document.getElementById('inputTpsName').value = '';
+                voteInputs.forEach(i => i.value = '');
+                document.getElementById('inputSuaraRusak').value = '';
+            }).catch(err => alert("Gagal Menyimpan Data TPS: " + err.message));
+        });
 
         // PROSES SINKRONISASI OTOMATIS: DPT VS SUARA MASUK
         function calculateSynchronization() {
@@ -321,7 +435,7 @@
 
             const sisaSuara = totalDpt - totalSuaraMasuk;
 
-            // Render ke UI
+            // Render Ringkasan angka
             document.getElementById('statTotalDpt').innerText = totalDpt.toLocaleString('id-ID');
             document.getElementById('statSuaraMasuk').innerText = totalSuaraMasuk.toLocaleString('id-ID');
             document.getElementById('statPartisipasi').innerText = `${persentasePartisipasi}%`;
@@ -332,7 +446,7 @@
             document.getElementById('dptProgressBar').style.width = `${clampedPercent}%`;
             document.getElementById('progressBarText').innerText = `${persentasePartisipasi}% Terhitung (${totalSuaraMasuk}/${totalDpt} DPT)`;
 
-            // Peringatan Anomali (Total Suara > DPT)
+            // Peringatan Anomali (Total Suara Masuk > DPT Desa)
             if (totalSuaraMasuk > totalDpt && totalDpt > 0) {
                 document.getElementById('dptProgressBar').className = "bg-red-600 h-3 rounded-full transition-all duration-500";
                 document.getElementById('progressBarText').innerHTML = `<span class="text-red-600"><i class="fa-solid fa-triangle-exclamation"></i> Peringatan: Suara Masuk Melebihi Total DPT!</span>`;
