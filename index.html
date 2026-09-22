@@ -8,12 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 1rem); }
-        .touch-action-manipulation { touch-action: manipulation; }
-    </style>
 </head>
 <body class="bg-gray-100 font-sans text-gray-800 antialiased min-h-screen pb-20 md:pb-6">
 
@@ -28,7 +22,6 @@
                 <p class="text-xs text-gray-500">Portal Masuk Saksi & Admin Tim Sukses</p>
             </div>
 
-            <!-- Login Form -->
             <form id="loginForm" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Email Akun</label>
@@ -46,7 +39,6 @@
                     <span>Masuk Aplikasi</span>
                 </button>
             </form>
-
             <div class="text-center pt-2 border-t border-gray-100 text-xs text-gray-400">
                 Hubungi Admin jika belum memiliki kata sandi atau akun baru.
             </div>
@@ -55,14 +47,12 @@
 
     <!-- MAIN APP DASHBOARD -->
     <div id="appScreen" class="hidden">
-        <!-- Header & App Bar -->
         <header class="bg-indigo-700 text-white shadow-md sticky top-0 z-40">
             <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-                <div class="flex items-center space-x-2">
+                <div class="flex items-center space-x-3">
                     <i class="fa-solid fa-vote-yea text-2xl text-yellow-300"></i>
                     <div>
                         <h1 class="font-bold text-lg leading-tight">Quick Count Pilkades</h1>
-                        <p class="text-xs text-indigo-200">Realtime Tim Sukses • Firebase Sync</p>
                     </div>
                 </div>
                 <div class="flex items-center space-x-2">
@@ -75,118 +65,59 @@
             </div>
         </header>
 
-        <!-- Main Content Container -->
-        <main class="max-w-4xl mx-auto px-3 sm:px-4 pt-4">
-
-            <!-- TAB 1: BERANDA / DASBOR -->
-            <section id="tab-beranda" class="tab-content space-y-4">
-                
-                <!-- Winner Highlight Card -->
-                <div class="bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl p-4 text-white shadow-lg flex items-center justify-between">
-                    <div>
-                        <span class="text-xs font-semibold uppercase tracking-wider bg-black/20 px-2 py-1 rounded-full">Unggul Sementara</span>
-                        <h2 id="winnerName" class="text-xl font-bold mt-1">Belum Ada Data</h2>
-                        <p id="winnerVotes" class="text-sm opacity-90">0 Suara (0%)</p>
-                    </div>
-                    <div class="text-4xl text-amber-200 opacity-80">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
+        <main class="max-w-4xl mx-auto px-4 py-4 space-y-4">
+            
+            <!-- RINGKASAN SINKRONISASI DPT & PARTISIPASI -->
+            <section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm">
+                    <p class="text-[11px] font-bold text-gray-400 uppercase">Total DPT Desa</p>
+                    <p id="statTotalDpt" class="text-xl font-extrabold text-gray-800 mt-0.5">0</p>
+                    <p class="text-[10px] text-gray-400">Pemilih Terdaftar</p>
                 </div>
-
-                <!-- Stats Overview Cards -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
-                        <p class="text-xs text-gray-500 font-medium">TPS Masuk</p>
-                        <p id="statTpsMasuk" class="text-lg font-bold text-gray-800">0 / 10</p>
-                    </div>
-                    <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
-                        <p class="text-xs text-gray-500 font-medium">Suara Sah</p>
-                        <p id="statSuaraSah" class="text-lg font-bold text-indigo-600">0</p>
-                    </div>
-                    <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
-                        <p class="text-xs text-gray-500 font-medium">Suara Tidak Sah</p>
-                        <p id="statSuaraTidakSah" class="text-lg font-bold text-red-500">0</p>
-                    </div>
-                    <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
-                        <p class="text-xs text-gray-500 font-medium">Total Masuk</p>
-                        <p id="statTotalSuara" class="text-lg font-bold text-emerald-600">0</p>
-                    </div>
+                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm">
+                    <p class="text-[11px] font-bold text-gray-400 uppercase">Total Suara Masuk</p>
+                    <p id="statSuaraMasuk" class="text-xl font-extrabold text-indigo-600 mt-0.5">0</p>
+                    <p class="text-[10px] text-gray-400">Sah + Tidak Sah</p>
                 </div>
-
-                <!-- Candidate Progress List -->
-                <div id="candidateCardsContainer" class="space-y-3">
-                    <!-- Injected via JS -->
+                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm">
+                    <p class="text-[11px] font-bold text-gray-400 uppercase">Partisipasi (Kehadiran)</p>
+                    <p id="statPartisipasi" class="text-xl font-extrabold text-emerald-600 mt-0.5">0%</p>
+                    <p class="text-[10px] text-gray-400">Rasio vs DPT</p>
                 </div>
+                <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm">
+                    <p class="text-[11px] font-bold text-gray-400 uppercase">Sisa / Unused Votes</p>
+                    <p id="statSisaSuara" class="text-xl font-extrabold text-amber-600 mt-0.5">0</p>
+                    <p class="text-[10px] text-gray-400">Belum Menggunakan Hak</p>
+                </div>
+            </section>
 
-                <!-- Chart Section -->
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                    <h3 class="font-bold text-gray-700 text-sm mb-3 flex items-center">
-                        <i class="fa-solid fa-chart-pie mr-2 text-indigo-600"></i> Persentase Perolehan Suara
-                    </h3>
-                    <div class="relative h-56 w-full flex justify-center items-center">
-                        <canvas id="quickCountChart"></canvas>
+            <!-- PROGRESS BAR SINKRONISASI PEMILIH -->
+            <section class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-2">
+                <div class="flex justify-between items-center text-xs font-bold">
+                    <span class="text-gray-700">Progres Suara Masuk Berdasarkan Total DPT</span>
+                    <span id="progressBarText" class="text-indigo-600">0% Terhitung</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                    <div id="dptProgressBar" class="bg-indigo-600 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </section>
+
+            <!-- DASHBOARD / REKAPITULASI LEADERBOARD -->
+            <section id="tab-dashboard" class="tab-content space-y-4">
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
+                    <div class="flex justify-between items-center border-b pb-2">
+                        <h3 class="font-bold text-gray-800 text-sm">Pemenang Sementara</h3>
+                        <span id="winnerBadge" class="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-0.5 rounded">Memimpin</span>
+                    </div>
+                    <h2 id="winnerName" class="text-xl font-bold mt-1">Belum Ada Data</h2>
+                    <div id="candidateCardsContainer" class="space-y-3">
+                        <!-- Injected via JS -->
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 2: INPUT DATA TPS -->
-            <section id="tab-input" class="tab-content hidden space-y-4">
-                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
-                    <h2 class="font-bold text-gray-800 text-base mb-1">Input Hasil Perhitungan TPS</h2>
-                    <p class="text-xs text-gray-500 mb-4">Pastikan data yang diinput sesuai dengan berita acara C1 di lapangan.</p>
-
-                    <form id="tpsForm" class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Nomor / Nama TPS</label>
-                            <input type="text" id="inputTpsName" placeholder="Contoh: TPS 01 RW 02" required 
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm">
-                        </div>
-
-                        <!-- Counter Controls for 3 Candidates -->
-                        <div id="candidateInputs" class="space-y-3">
-                            <!-- Injected via JS -->
-                        </div>
-
-                        <!-- Invalid Votes Input -->
-                        <div class="bg-red-50 p-3 rounded-lg border border-red-200">
-                            <label class="block text-xs font-bold text-red-700 uppercase tracking-wide mb-1">Suara Tidak Sah / Rusak</label>
-                            <div class="flex items-center space-x-2">
-                                <button type="button" onclick="adjustCount('inputSuaraRusak', -1)" 
-                                    class="w-10 h-10 bg-red-200 text-red-800 font-bold rounded-lg text-lg flex items-center justify-center active:scale-95 touch-action-manipulation">-</button>
-                                <input type="number" id="inputSuaraRusak" value="0" min="0" 
-                                    class="w-full px-3 py-2 border border-red-300 rounded-lg text-center font-bold text-red-700 text-base focus:ring-2 focus:ring-red-500 focus:outline-none">
-                                <button type="button" onclick="adjustCount('inputSuaraRusak', 1)" 
-                                    class="w-10 h-10 bg-red-600 text-white font-bold rounded-lg text-lg flex items-center justify-center active:scale-95 touch-action-manipulation">+</button>
-                            </div>
-                        </div>
-
-                        <button type="submit" 
-                            class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md transition-all active:scale-[0.98] flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-paper-plane"></i>
-                            <span>Simpan & Kirim Data TPS</span>
-                        </button>
-                    </form>
-                </div>
-            </section>
-
-            <!-- TAB 3: REKAP DATA TPS -->
-            <section id="tab-rekap" class="tab-content hidden space-y-4">
-                <div class="flex justify-between items-center">
-                    <h2 class="font-bold text-gray-800 text-base">Rekapitulasi Suara Per TPS</h2>
-                    <button onclick="copyToWhatsApp()" class="bg-emerald-600 text-white text-xs px-3 py-2 rounded-lg font-medium shadow flex items-center space-x-1 active:scale-95">
-                        <i class="fa-brands fa-whatsapp text-sm"></i>
-                        <span>Salin Laporan WA</span>
-                    </button>
-                </div>
-
-                <div id="tpsListContainer" class="space-y-2.5">
-                    <!-- Injected via JS -->
-                </div>
-            </section>
-
-            <!-- TAB 4: PENGATURAN & PANEL ADMIN -->
-            <section id="tab-pengaturan" class="tab-content hidden space-y-4">
-                <!-- User Profile Info -->
+            <!-- TAB PENGATURAN & PANEL ADMIN -->
+            <section id="tab-pengaturan" class="tab-content space-y-4">
                 <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 flex justify-between items-center">
                     <div>
                         <p class="text-xs text-indigo-500 font-semibold uppercase">Akun Terhubung</p>
@@ -218,40 +149,27 @@
                     </form>
                 </div>
 
-                <!-- ADMIN ONLY: Pengaturan Calon -->
+                <!-- ADMIN ONLY: Pengaturan Calon & DPT -->
                 <div id="adminSettingsPanel" class="admin-only hidden bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                    <h2 class="font-bold text-gray-800 text-base">Pengaturan Calon & Sistem</h2>
-                    
+                    <h2 class="font-bold text-gray-800 text-base">Pengaturan Calon & Target DPT</h2>
+
                     <form id="settingsForm" class="space-y-3">
                         <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Calon 01</label>
-                            <input type="text" id="settingC1" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Total DPT Seluruh Desa</label>
+                            <input type="number" id="settingTotalDpt" placeholder="Contoh: 3500" min="1" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm font-bold text-indigo-600">
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Calon 02</label>
-                            <input type="text" id="settingC2" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                        <div class="border-t pt-2 space-y-2">
+                            <label class="block text-xs font-semibold text-gray-600">Nama Calon / Paslon</label>
+                            <input type="text" id="settingC1" placeholder="Nama Calon 1" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                            <input type="text" id="settingC2" placeholder="Nama Calon 2" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
+                            <input type="text" id="settingC3" placeholder="Nama Calon 3" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
                         </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Calon 03</label>
-                            <input type="text" id="settingC3" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-600 mb-1">Target Total TPS</label>
-                            <input type="number" id="settingTargetTps" min="1" required class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
-                        </div>
-                        <button type="submit" class="w-full bg-gray-800 text-white font-bold py-2 rounded-lg text-sm shadow">
+                        <button type="submit" class="w-full bg-indigo-600 text-white font-bold py-2 rounded-lg text-sm shadow">
                             Simpan Pengaturan
                         </button>
                     </form>
 
-                    <hr class="my-4 border-gray-200">
-
-                    <div class="space-y-2">
-                        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wide">Backup & Reset Data</h3>
-                        <button onclick="exportToCSV()" class="w-full bg-emerald-100 text-emerald-800 font-semibold py-2 rounded-lg text-xs flex items-center justify-center space-x-1 border border-emerald-300">
-                            <i class="fa-solid fa-file-excel"></i>
-                            <span>Ekspor Data ke CSV / Excel</span>
-                        </button>
+                    <div class="border-t pt-3">
                         <button onclick="resetAllData()" class="w-full bg-red-100 text-red-700 font-semibold py-2 rounded-lg text-xs flex items-center justify-center space-x-1 border border-red-300">
                             <i class="fa-solid fa-trash-alt"></i>
                             <span>Reset/Hapus Seluruh Data TPS</span>
@@ -259,88 +177,49 @@
                     </div>
                 </div>
 
-                <!-- TIMSES VIEW NOTICE -->
                 <div id="timsesNotice" class="bg-yellow-50 border border-yellow-200 p-4 rounded-xl text-xs text-yellow-800">
-                    <i class="fa-solid fa-circle-info mr-1"></i> Anda masuk sebagai <b>Timses / Saksi TPS</b>. Pengaturan calon dan hapus data hanya dapat dikelola oleh Admin.
+                    <i class="fa-solid fa-circle-info mr-1"></i> Anda masuk sebagai <b>Timses / Saksi TPS</b>. Pengaturan calon dan DPT Desa hanya dapat dikelola oleh Admin.
                 </div>
             </section>
-
         </main>
-
-        <!-- Bottom Navigation Bar (Mobile Native App Style) -->
-        <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 pb-safe">
-            <div class="max-w-4xl mx-auto flex justify-around items-center h-14">
-                <button onclick="switchTab('beranda')" id="nav-beranda" class="nav-btn flex-1 flex flex-col items-center justify-center text-indigo-600">
-                    <i class="fa-solid fa-chart-line text-lg"></i>
-                    <span class="text-[10px] font-medium mt-0.5">Beranda</span>
-                </button>
-                <button onclick="switchTab('input')" id="nav-input" class="nav-btn flex-1 flex flex-col items-center justify-center text-gray-400">
-                    <i class="fa-solid fa-plus-circle text-lg"></i>
-                    <span class="text-[10px] font-medium mt-0.5">Input TPS</span>
-                </button>
-                <button onclick="switchTab('rekap')" id="nav-rekap" class="nav-btn flex-1 flex flex-col items-center justify-center text-gray-400">
-                    <i class="fa-solid fa-list-check text-lg"></i>
-                    <span class="text-[10px] font-medium mt-0.5">Data TPS</span>
-                </button>
-                <button onclick="switchTab('pengaturan')" id="nav-pengaturan" class="nav-btn flex-1 flex flex-col items-center justify-center text-gray-400">
-                    <i class="fa-solid fa-gear text-lg"></i>
-                    <span class="text-[10px] font-medium mt-0.5">Pengaturan</span>
-                </button>
-            </div>
-        </nav>
     </div>
 
-    <!-- FIREBASE MODULES & MULTI-ROLE LOGIC -->
+    <!-- FIREBASE MODULES & LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Firebase Configuration
+        // Konfigurasi Firebase
         const firebaseConfig = {
-            apiKey: "AIzaSyDLIVxoa33Iite3Dpv-0yTg-9hX1F9907c",
-            authDomain: "hitungcepat-35b48.firebaseapp.com",
-            databaseURL: "https://hitungcepat-35b48-default-rtdb.asia-southeast1.firebasedatabase.app/",
-            projectId: "hitungcepat-35b48",
-            storageBucket: "hitungcepat-35b48.firebasestorage.app",
-            messagingSenderId: "149314985401",
-            appId: "1:149314985401:web:9000057cacf07048a96a68",
-            measurementId: "G-4BQ9R9CFJR"
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        // Application State
         let appSettings = {
-            candidates: ["Calon 01", "Calon 02", "Calon 03"],
-            targetTps: 10
+            totalDpt: 0,
+            candidates: ["Calon 1", "Calon 2", "Calon 3"]
         };
         let tpsDataList = {};
-        let myChart = null;
         let isAdmin = false;
 
-        const candidateColors = [
-            { bg: "bg-blue-500", text: "text-blue-600", border: "border-blue-500", hex: "#3b82f6" },
-            { bg: "bg-emerald-500", text: "text-emerald-600", border: "border-emerald-500", hex: "#10b981" },
-            { bg: "bg-purple-500", text: "text-purple-600", border: "border-purple-500", hex: "#a855f7" }
-        ];
-
-        // --- AUTHENTICATION & ROLE LISTENERS ---
+        // AUTHENTICATION & ROLE LISTENERS
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('authScreen').classList.add('hidden');
                 document.getElementById('appScreen').classList.remove('hidden');
                 document.getElementById('userEmailDisplay').innerText = user.email;
 
-                // Cek Role berdasarkan Email Admin
                 checkUserRole(user.email);
-
-                setupChart();
-                renderInputFormFields();
-                loadSettingsToForm();
                 initFirebaseListeners();
             } else {
                 document.getElementById('authScreen').classList.remove('hidden');
@@ -349,35 +228,31 @@
         });
 
         function checkUserRole(email) {
-            // Ditentukan email utama yang bertindak sebagai Admin
             if (email.toLowerCase().includes("admin") || email.toLowerCase() === "masmam30@gmail.com") {
                 isAdmin = true;
                 document.getElementById('roleBadge').innerText = "ADMIN";
                 document.getElementById('roleBadge').className = "px-2 py-0.5 rounded text-xs font-bold bg-red-500 text-white uppercase";
-                
                 document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));
                 document.getElementById('timsesNotice').classList.add('hidden');
             } else {
                 isAdmin = false;
                 document.getElementById('roleBadge').innerText = "TIMSES";
                 document.getElementById('roleBadge').className = "px-2 py-0.5 rounded text-xs font-bold bg-yellow-400 text-yellow-900 uppercase";
-                
                 document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));
                 document.getElementById('timsesNotice').classList.remove('hidden');
             }
         }
 
-        // Login Handler
+        // LOGIN HANDLER
         document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-
             signInWithEmailAndPassword(auth, email, password)
                 .catch((error) => alert("Gagal Login: " + error.message));
         });
 
-        // ADMIN: Mendaftarkan Akun Timses Baru
+        // REGISTER TIMSES HANDLER (ADMIN ONLY)
         document.getElementById('createTimsesForm').addEventListener('submit', (e) => {
             e.preventDefault();
             if (!isAdmin) return alert("Hanya Admin yang dapat membuat akun timses!");
@@ -394,337 +269,109 @@
         });
 
         window.logoutUser = function() {
-            if (confirm("Apakah Anda yakin ingin keluar dari akun?")) {
-                signOut(auth);
-            }
+            signOut(auth);
         };
 
-        // --- DATABASE LISTENERS & UI LOGIC ---
+        // LISTEN DATA REALTIME FIREBASE
         function initFirebaseListeners() {
-            const syncStatus = document.getElementById('syncStatus');
-
+            // Synchronize Settings (Termasuk DPT)
             onValue(ref(db, 'settings'), (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     appSettings = data;
-                    renderInputFormFields();
+                    if(!appSettings.totalDpt) appSettings.totalDpt = 0;
                     loadSettingsToForm();
-                    updateUI();
+                    calculateSynchronization();
                 } else if (isAdmin) {
                     set(ref(db, 'settings'), appSettings);
                 }
             });
 
+            // Synchronize Data TPS
             onValue(ref(db, 'tpsData'), (snapshot) => {
-                const data = snapshot.val();
-                tpsDataList = data || {};
-                
-                syncStatus.className = "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-800 text-emerald-200";
-                syncStatus.innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-emerald-400"></span>Terhubung`;
-
-                updateUI();
-            }, (error) => {
-                syncStatus.className = "inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-800 text-red-200";
-                syncStatus.innerHTML = `<span class="w-2 h-2 mr-1.5 rounded-full bg-red-400"></span>Terputus`;
-            });
-        }
-
-        function renderInputFormFields() {
-            const container = document.getElementById('candidateInputs');
-            container.innerHTML = '';
-
-            appSettings.candidates.forEach((name, index) => {
-                const col = candidateColors[index % candidateColors.length];
-                container.innerHTML += `
-                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                        <label class="block text-xs font-bold ${col.text} uppercase tracking-wide mb-1">0${index+1}. ${name}</label>
-                        <div class="flex items-center space-x-2">
-                            <button type="button" onclick="adjustCount('c_${index}', -1)" 
-                                class="w-10 h-10 bg-gray-200 text-gray-800 font-bold rounded-lg text-lg flex items-center justify-center active:scale-95 touch-action-manipulation">-</button>
-                            <input type="number" id="c_${index}" value="0" min="0" 
-                                class="candidate-vote-input w-full px-3 py-2 border border-gray-300 rounded-lg text-center font-bold text-gray-800 text-base focus:ring-2 focus:ring-indigo-500 focus:outline-none">
-                            <button type="button" onclick="adjustCount('c_${index}', 1)" 
-                                class="w-10 h-10 ${col.bg} text-white font-bold rounded-lg text-lg flex items-center justify-center active:scale-95 touch-action-manipulation">+</button>
-                        </div>
-                    </div>
+                tpsDataList = snapshot.val() || {};
+                calculateSynchronization();
+                document.getElementById('syncStatus').innerHTML = `
+                    <span class="w-2 h-2 mr-1.5 rounded-full bg-emerald-400"></span>
+                    Terhubung
                 `;
             });
         }
 
-        function updateUI() {
-            const tpsKeys = Object.keys(tpsDataList);
-            const totalTpsMasuk = tpsKeys.length;
-            
-            let candidateVotes = [0, 0, 0];
-            let totalSuaraTidakSah = 0;
+        // PROSES SINKRONISASI OTOMATIS: DPT VS SUARA MASUK
+        function calculateSynchronization() {
+            const totalDpt = parseInt(appSettings.totalDpt) || 0;
+            let totalSuaraMasuk = 0;
 
-            tpsKeys.forEach(key => {
-                const item = tpsDataList[key];
-                if (item.votes) {
-                    item.votes.forEach((v, idx) => {
-                        candidateVotes[idx] = (candidateVotes[idx] || 0) + (parseInt(v) || 0);
-                    });
+            // Iterasi & Kalkulasi Seluruh TPS
+            Object.values(tpsDataList).forEach(tps => {
+                let suaraTpsSah = 0;
+                if (tps.votes && Array.isArray(tps.votes)) {
+                    suaraTpsSah = tps.votes.reduce((acc, curr) => acc + (parseInt(curr) || 0), 0);
                 }
-                totalSuaraTidakSah += parseInt(item.rusak || 0);
+                const suaraRusak = parseInt(tps.rusak) || 0;
+                totalSuaraMasuk += (suaraTpsSah + suaraRusak);
             });
 
-            const totalSuaraSah = candidateVotes.reduce((a, b) => a + b, 0);
-            const grandTotalSuara = totalSuaraSah + totalSuaraTidakSah;
+            // Rasio & Persentase
+            let persentasePartisipasi = 0;
+            if (totalDpt > 0) {
+                persentasePartisipasi = ((totalSuaraMasuk / totalDpt) * 100).toFixed(1);
+            }
 
-            document.getElementById('statTpsMasuk').innerText = `${totalTpsMasuk} / ${appSettings.targetTps}`;
-            document.getElementById('statSuaraSah').innerText = totalSuaraSah.toLocaleString('id-ID');
-            document.getElementById('statSuaraTidakSah').innerText = totalSuaraTidakSah.toLocaleString('id-ID');
-            document.getElementById('statTotalSuara').innerText = grandTotalSuara.toLocaleString('id-ID');
+            const sisaSuara = totalDpt - totalSuaraMasuk;
 
-            const cardsContainer = document.getElementById('candidateCardsContainer');
-            cardsContainer.innerHTML = '';
+            // Render ke UI
+            document.getElementById('statTotalDpt').innerText = totalDpt.toLocaleString('id-ID');
+            document.getElementById('statSuaraMasuk').innerText = totalSuaraMasuk.toLocaleString('id-ID');
+            document.getElementById('statPartisipasi').innerText = `${persentasePartisipasi}%`;
+            document.getElementById('statSisaSuara').innerText = (sisaSuara < 0 ? 0 : sisaSuara).toLocaleString('id-ID');
 
-            let maxVotes = -1;
-            let winnerIndex = 0;
+            // Render Progress Bar
+            const clampedPercent = Math.min(Math.max(persentasePartisipasi, 0), 100);
+            document.getElementById('dptProgressBar').style.width = `${clampedPercent}%`;
+            document.getElementById('progressBarText').innerText = `${persentasePartisipasi}% Terhitung (${totalSuaraMasuk}/${totalDpt} DPT)`;
 
-            appSettings.candidates.forEach((name, idx) => {
-                const votes = candidateVotes[idx] || 0;
-                const percentage = totalSuaraSah > 0 ? ((votes / totalSuaraSah) * 100).toFixed(1) : 0;
-                const col = candidateColors[idx % candidateColors.length];
-
-                if (votes > maxVotes) {
-                    maxVotes = votes;
-                    winnerIndex = idx;
-                }
-
-                cardsContainer.innerHTML += `
-                    <div class="bg-white p-3.5 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
-                        <div class="flex justify-between items-center mb-1.5">
-                            <div class="flex items-center space-x-2">
-                                <span class="w-6 h-6 rounded-full ${col.bg} text-white text-xs font-bold flex items-center justify-center">0${idx+1}</span>
-                                <h4 class="font-bold text-gray-800 text-sm">${name}</h4>
-                            </div>
-                            <div class="text-right">
-                                <span class="text-base font-extrabold text-gray-800">${votes.toLocaleString('id-ID')}</span>
-                                <span class="text-xs text-gray-500 font-medium"> (${percentage}%)</span>
-                            </div>
-                        </div>
-                        <div class="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
-                            <div class="${col.bg} h-2.5 rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
-                        </div>
-                    </div>
-                `;
-            });
-
-            if (totalSuaraSah > 0) {
-                const winPct = ((candidateVotes[winnerIndex] / totalSuaraSah) * 100).toFixed(1);
-                document.getElementById('winnerName').innerText = `0${winnerIndex+1}. ${appSettings.candidates[winnerIndex]}`;
-                document.getElementById('winnerVotes').innerText = `${candidateVotes[winnerIndex].toLocaleString('id-ID')} Suara (${winPct}%)`;
+            // Peringatan Anomali (Total Suara > DPT)
+            if (totalSuaraMasuk > totalDpt && totalDpt > 0) {
+                document.getElementById('dptProgressBar').className = "bg-red-600 h-3 rounded-full transition-all duration-500";
+                document.getElementById('progressBarText').innerHTML = `<span class="text-red-600"><i class="fa-solid fa-triangle-exclamation"></i> Peringatan: Suara Masuk Melebihi Total DPT!</span>`;
             } else {
-                document.getElementById('winnerName').innerText = "Belum Ada Data";
-                document.getElementById('winnerVotes').innerText = "0 Suara (0%)";
+                document.getElementById('dptProgressBar').className = "bg-indigo-600 h-3 rounded-full transition-all duration-500";
             }
-
-            if (myChart) {
-                myChart.data.labels = appSettings.candidates;
-                myChart.data.datasets[0].data = candidateVotes;
-                myChart.update();
-            }
-
-            renderTpsList();
         }
 
-        function renderTpsList() {
-            const container = document.getElementById('tpsListContainer');
-            container.innerHTML = '';
-
-            const tpsKeys = Object.keys(tpsDataList);
-            if (tpsKeys.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-8 text-gray-400 bg-white rounded-xl border border-gray-200">
-                        <i class="fa-solid fa-inbox text-3xl mb-2"></i>
-                        <p class="text-xs">Belum ada data TPS yang masuk.</p>
-                    </div>
-                `;
-                return;
-            }
-
-            tpsKeys.reverse().forEach(key => {
-                const item = tpsDataList[key];
-                let detailSuaraHtml = '';
-
-                appSettings.candidates.forEach((cName, idx) => {
-                    const col = candidateColors[idx % candidateColors.length];
-                    const count = item.votes ? item.votes[idx] || 0 : 0;
-                    detailSuaraHtml += `<span class="text-xs ${col.text} font-bold mr-2">C${idx+1}: ${count}</span>`;
-                });
-
-                // Tombol hapus hanya muncul untuk ADMIN
-                const deleteBtnHtml = isAdmin ? `
-                    <button onclick="deleteTps('${key}')" class="text-gray-400 hover:text-red-500 p-2 active:scale-95" title="Hapus TPS (Khusus Admin)">
-                        <i class="fa-solid fa-trash-can text-sm"></i>
-                    </button>
-                ` : '';
-
-                container.innerHTML += `
-                    <div class="bg-white p-3 rounded-xl border border-gray-200 shadow-sm flex justify-between items-center">
-                        <div>
-                            <h4 class="font-bold text-gray-800 text-sm">${item.name}</h4>
-                            <div class="mt-0.5">${detailSuaraHtml} <span class="text-xs text-red-500 font-semibold">| Rusak: ${item.rusak || 0}</span></div>
-                            <p class="text-[10px] text-gray-400 mt-1">Penginput: ${item.createdBy || 'Anonim'}</p>
-                        </div>
-                        ${deleteBtnHtml}
-                    </div>
-                `;
-            });
+        function loadSettingsToForm() {
+            document.getElementById('settingTotalDpt').value = appSettings.totalDpt || 0;
+            document.getElementById('settingC1').value = appSettings.candidates[0] || '';
+            document.getElementById('settingC2').value = appSettings.candidates[1] || '';
+            document.getElementById('settingC3').value = appSettings.candidates[2] || '';
         }
 
-        function setupChart() {
-            const ctx = document.getElementById('quickCountChart').getContext('2d');
-            myChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: appSettings.candidates,
-                    datasets: [{
-                        data: [0, 0, 0],
-                        backgroundColor: candidateColors.map(c => c.hex),
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
-                    }
-                }
-            });
-        }
-
-        document.getElementById('tpsForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const tpsName = document.getElementById('inputTpsName').value.trim();
-            const votes = appSettings.candidates.map((_, idx) => parseInt(document.getElementById(`c_${idx}`).value) || 0);
-            const rusak = parseInt(document.getElementById('inputSuaraRusak').value) || 0;
-            const tpsId = tpsName.toLowerCase().replace(/[^a-z0-9]/g, '_');
-
-            set(ref(db, `tpsData/${tpsId}`), {
-                name: tpsName,
-                votes: votes,
-                rusak: rusak,
-                createdBy: auth.currentUser ? auth.currentUser.email : 'Unknown',
-                timestamp: Date.now()
-            }).then(() => {
-                alert(`Data ${tpsName} berhasil disimpan!`);
-                document.getElementById('tpsForm').reset();
-                switchTab('beranda');
-            }).catch((err) => {
-                alert("Gagal menyimpan data: " + err.message);
-            });
-        });
-
+        // SIMPAN PENGATURAN (ADMIN)
         document.getElementById('settingsForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            if (!isAdmin) return alert("Akses Ditolak: Hanya Admin yang dapat mengubah nama calon!");
+            if (!isAdmin) return alert("Akses Ditolak: Hanya Admin yang dapat mengubah nama calon & DPT!");
 
             const newSettings = {
+                totalDpt: parseInt(document.getElementById('settingTotalDpt').value) || 0,
                 candidates: [
                     document.getElementById('settingC1').value.trim(),
                     document.getElementById('settingC2').value.trim(),
                     document.getElementById('settingC3').value.trim()
-                ],
-                targetTps: parseInt(document.getElementById('settingTargetTps').value) || 10
+                ].filter(Boolean)
             };
 
-            set(ref(db, 'settings'), newSettings).then(() => {
-                alert('Pengaturan berhasil diperbarui!');
-            });
+            set(ref(db, 'settings'), newSettings)
+                .then(() => alert("Pengaturan DPT & Calon berhasil disimpan!"))
+                .catch(err => alert("Gagal menyimpan: " + err.message));
         });
-
-        function loadSettingsToForm() {
-            document.getElementById('settingC1').value = appSettings.candidates[0] || '';
-            document.getElementById('settingC2').value = appSettings.candidates[1] || '';
-            document.getElementById('settingC3').value = appSettings.candidates[2] || '';
-            document.getElementById('settingTargetTps').value = appSettings.targetTps || 10;
-        }
-
-        window.adjustCount = function(id, delta) {
-            const input = document.getElementById(id);
-            let val = parseInt(input.value) || 0;
-            val = Math.max(0, val + delta);
-            input.value = val;
-        };
-
-        window.switchTab = function(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
-
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-indigo-600');
-                btn.classList.add('text-gray-400');
-            });
-            document.getElementById(`nav-${tabName}`).classList.remove('text-gray-400');
-            document.getElementById(`nav-${tabName}`).classList.add('text-indigo-600');
-        };
-
-        window.deleteTps = function(key) {
-            if (!isAdmin) return alert("Hanya Admin yang memiliki hak akses menghapus data TPS!");
-            if (confirm("Apakah Anda yakin ingin menghapus data TPS ini?")) {
-                remove(ref(db, `tpsData/${key}`));
-            }
-        };
 
         window.resetAllData = function() {
             if (!isAdmin) return alert("Hanya Admin yang memiliki hak akses me-reset seluruh data!");
             if (confirm("PERINGATAN ADMIN! Seluruh data TPS akan dihapus secara permanen. Lanjutkan?")) {
                 remove(ref(db, 'tpsData')).then(() => alert("Seluruh data TPS telah di-reset."));
             }
-        };
-
-        window.copyToWhatsApp = function() {
-            const tpsKeys = Object.keys(tpsDataList);
-            let totalVotes = [0, 0, 0];
-            let totalRusak = 0;
-
-            tpsKeys.forEach(k => {
-                const item = tpsDataList[k];
-                if (item.votes) item.votes.forEach((v, i) => totalVotes[i] += parseInt(v) || 0);
-                totalRusak += parseInt(item.rusak) || 0;
-            });
-
-            const totalSah = totalVotes.reduce((a, b) => a + b, 0);
-
-            let text = `*LAPORAN QUICK COUNT PILKADES*\n`;
-            text += `Total TPS Masuk: ${tpsKeys.length} / ${appSettings.targetTps}\n\n`;
-            text += `*PEROLEHAN SUARA:*\n`;
-            appSettings.candidates.forEach((name, idx) => {
-                const v = totalVotes[idx];
-                const pct = totalSah > 0 ? ((v / totalSah) * 100).toFixed(1) : 0;
-                text += `0${idx+1}. ${name}: ${v.toLocaleString('id-ID')} (${pct}%)\n`;
-            });
-            text += `\nSuara Tidak Sah: ${totalRusak.toLocaleString('id-ID')}\n`;
-            text += `Total Suara Sah: ${totalSah.toLocaleString('id-ID')}\n\n`;
-            text += `_Diperbarui secara otomatis via Quick Count App_`;
-
-            navigator.clipboard.writeText(text).then(() => {
-                alert("Laporan berhasil disalin! Tinggal tempel (Paste) di grup WhatsApp.");
-            });
-        };
-
-        window.exportToCSV = function() {
-            const tpsKeys = Object.keys(tpsDataList);
-            if (tpsKeys.length === 0) return alert("Belum ada data untuk diekspor!");
-
-            let csv = `Nama TPS,${appSettings.candidates.join(',')},Suara Rusak,Total Suara,Penginput\n`;
-
-            tpsKeys.forEach(k => {
-                const item = tpsDataList[k];
-                const v = item.votes || [0, 0, 0];
-                const total = v.reduce((a,b) => a+b, 0) + (parseInt(item.rusak) || 0);
-                csv += `"${item.name}",${v.join(',')},${item.rusak || 0},${total},"${item.createdBy || '-'}"\n`;
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `quick_count_pilkades_${Date.now()}.csv`;
-            a.click();
         };
     </script>
 </body>
